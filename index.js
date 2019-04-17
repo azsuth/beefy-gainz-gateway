@@ -16,6 +16,9 @@ async function verify(idToken) {
     const payload = ticket.getPayload();
     const userId = payload['sub'];
 
+    console.log('idToken: ', idToken);
+    console.log('userId: ', userId);
+
     return userId;
 }
 
@@ -26,8 +29,6 @@ app.use((req, res, next) => {
         next();
         return;
     }
-
-    console.log('asdf andrew sutherland');
 
     const idToken = req.header('idToken');
     verify(idToken)
