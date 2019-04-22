@@ -1,0 +1,22 @@
+sudo: required
+language: node_js
+
+services:
+  - docker
+
+node_js:
+  - 8
+
+env:
+  global:
+    - SHA=$(git rev-parse HEAD)
+
+cache:
+  directories:
+    - node_modules
+
+script:
+  - docker image build -t $DOCKER_USERNAME/$DOCKER_IMAGE:latest -t $DOCKER_USERNAME/$DOCKER_IMAGE:$SHA .
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker push $DOCKER_USERNAME/$DOCKER_IMAGE:latest
+  - docker push $DOCKER_USERNAME/$DOCKER_IMAGE:$SHA
