@@ -1,7 +1,7 @@
 const express = require('express');
 const proxy = require('express-http-proxy');
 const { OAuth2Client } = require('google-auth-library');
-const { port, clientId } = require('./config');
+const { port, clientId, router } = require('./config');
 
 const app = express();
 const client = new OAuth2Client(clientId);
@@ -44,7 +44,7 @@ app.use((req, res, next) => {
 });
 
 // catch all to proxy all requests to the router
-app.use(proxy('http://router'));
+app.use(proxy(router));
 
 app.listen(port, () => {
     console.log('Gateway listening on port ' + port);
