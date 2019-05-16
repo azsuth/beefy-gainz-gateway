@@ -1,7 +1,7 @@
 const express = require('express');
 const proxy = require('express-http-proxy');
 const { OAuth2Client } = require('google-auth-library');
-const { port, clientId, router } = require('./config');
+const { port, clientId, router, userIdOverride } = require('./config');
 
 const app = express();
 const client = new OAuth2Client(clientId);
@@ -16,8 +16,8 @@ async function verify(idToken) {
     const payload = ticket.getPayload();
     const userId = payload['sub'];
 
-    console.log('idToken: ', idToken);
-    console.log('userId: ', userId);
+    console.log('idToken:', idToken);
+    console.log('userId:', userId);
 
     return userId;
 }
@@ -34,7 +34,7 @@ app.use((req, res, next) => {
     verify(idToken)
         .then((userId) => {
             // pass the userId to all upstream services
-            req.headers['userId'] = userId;
+            req.headers['userId'] = userIdOverride || userId;
             next();
         })
         .catch((err) => {
