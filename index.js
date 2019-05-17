@@ -55,7 +55,7 @@ app.use(
   proxy(exerciseUpstream, {
     proxyReqPathResolver: req => {
       const query = req.url.split('?');
-      return `/exercises?${query[1]}`;
+      return `/exercises${req.path}?${query[1]}`;
     }
   })
 );
@@ -63,5 +63,5 @@ app.use(
 app.use('/', proxy(clientUpstream));
 
 app.listen(port, () => {
-  console.log('Gateway listening on port ' + port);
+  console.log(`Gateway listening on port ${port}`);
 });
