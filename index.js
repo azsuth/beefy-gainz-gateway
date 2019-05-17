@@ -37,11 +37,17 @@ app.use((req, res, next) => {
     return;
   }
 
+  if (userIdOverride) {
+    req.headers['userId'] = userIdOverride;
+    next();
+    return;
+  }
+
   const idToken = req.header('idToken');
   verify(idToken)
     .then(userId => {
       // pass the userId to all upstream services
-      req.headers['userId'] = userIdOverride || userId;
+      req.headers['userId'] = userId;
       next();
     })
     .catch(err => {
