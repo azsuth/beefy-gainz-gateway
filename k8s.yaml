@@ -20,12 +20,16 @@ spec:
           env:
             - name: GATEWAY_PORT
               value: '3001'
-            - name: GATEWAY_CLIENT_UPSTREAM
-              value: 'http://client-service:3000'
             - name: GATEWAY_EXERCISE_UPSTREAM
               value: 'http://exercise-service:8080'
             - name: GATEWAY_USER_ID_OVERRIDE
               value: '12345'
+            - name: GATEWAY_GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-google-client-id
+                  key: client_id
+            
 
 ---
 
@@ -34,10 +38,9 @@ kind: Service
 metadata:
   name: gateway-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     component: gateway
   ports:
     - port: 3001
       targetPort: 3001
-      nodePort: 30100
