@@ -6,7 +6,6 @@ const {
   port,
   clientId,
   userIdOverride,
-  clientUpstream,
   exerciseUpstream
 } = require('./config');
 
@@ -31,12 +30,6 @@ async function verify(idToken) {
 
 // catch all to handle authentication
 app.use((req, res, next) => {
-  // only authenticate requests to paths starting with /api
-  if (!req.path.startsWith('/api')) {
-    next();
-    return;
-  }
-
   if (userIdOverride) {
     req.headers['userId'] = userIdOverride;
     next();
@@ -57,7 +50,7 @@ app.use((req, res, next) => {
 });
 
 app.use(
-  '/api/exercises',
+  '/exercises',
   proxy(exerciseUpstream, {
     proxyReqPathResolver: req => {
       const query = req.url.split('?');
@@ -65,8 +58,6 @@ app.use(
     }
   })
 );
-
-app.use('/', proxy(clientUpstream));
 
 app.listen(port, () => {
   console.log(`Gateway listening on port ${port}`);
