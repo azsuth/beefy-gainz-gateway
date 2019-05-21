@@ -22,8 +22,6 @@ spec:
               value: '3001'
             - name: GATEWAY_EXERCISE_UPSTREAM
               value: 'http://exercise-service:8080'
-            - name: GATEWAY_USER_ID_OVERRIDE
-              value: '12345'
             - name: GATEWAY_GOOGLE_CLIENT_ID
               valueFrom:
                 secretKeyRef:
