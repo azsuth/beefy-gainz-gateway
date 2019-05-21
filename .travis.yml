@@ -10,6 +10,7 @@ node_js:
 env:
   global:
     - SHA=$(git rev-parse HEAD)
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 
 cache:
   directories:
@@ -17,9 +18,26 @@ cache:
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_0c35eebf403c_key -iv $encrypted_0c35eebf403c_iv -in service-account.json.enc -out service-account.json -d    
+  - curl https://sdk.cloud.google.com | bash > /dev/null;
+  - source $HOME/google-cloud-sdk/path.bash.inc
+  - gcloud components update kubectl
+  - gcloud auth activate-service-account --key-file service-account.json
+  - gcloud config set project beefy-gainz-1555366059329
+  - gcloud config set compute/zone us-central1-a
+  - gcloud container clusters get-credentials beefy-gainz-cluster-1
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin     
 
 script:
-  - docker image build -t $DOCKER_USERNAME/$DOCKER_IMAGE:latest -t $DOCKER_USERNAME/$DOCKER_IMAGE:$SHA .
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push $DOCKER_USERNAME/$DOCKER_IMAGE:latest
-  - docker push $DOCKER_USERNAME/$DOCKER_IMAGE:$SHA
+  - echo "No script steps, skipping"
+
+
+after_success:
+  - docker image build -t azsuth/beefy-gainz-gateway:latest -t azsuth/beefy-gainz-gateway:$SHA .
+  - docker push azsuth/beefy-gainz-gateway:latest
+  - docker push azsuth/beefy-gainz-gateway:$SHA
+
+deploy:
+  provider: script
+  script: bash ./deploy.sh
+  on:
+    branch: master  
